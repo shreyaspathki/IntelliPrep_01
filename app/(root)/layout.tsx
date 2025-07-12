@@ -32,7 +32,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
         </Link>
 
         <div className="flex items-center gap-4">
-          <span className="text-primary-200 font-medium">
+          <span className="text-primary-200 font-medium max-sm:hidden">
             Welcome, {user?.name || "User"}
           </span>
           <LogoutButton />
