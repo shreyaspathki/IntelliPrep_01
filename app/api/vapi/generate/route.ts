@@ -5,9 +5,16 @@ import { db } from "@/firebase/admin";
 import { getRandomInterviewCover } from "@/lib/utils";
 
 export async function POST(request: Request) {
-  const { type, role, level, techstack, amount, userid } = await request.json();
-
   try {
+    const { type, role, level, techstack, amount, userid } = await request.json();
+    
+    console.log("Received interview data:", { type, role, level, techstack, amount, userid });
+
+    if (!type || !role || !level || !techstack || !amount || !userid) {
+      console.error("Missing required fields:", { type, role, level, techstack, amount, userid });
+      return Response.json({ success: false, error: "Missing required fields" }, { status: 400 });
+    }
+
     const { text: questions } = await generateText({
       model: google("gemini-2.0-flash-001"),
       prompt: `Prepare questions for a job interview.
@@ -25,24 +32,43 @@ export async function POST(request: Request) {
     `,
     });
 
+    console.log("Generated questions:", questions);
+
+    let parsedQuestions;
+    try {
+      parsedQuestions = JSON.parse(questions);
+    } catch (parseError) {
+      console.error("Error parsing questions:", parseError);
+      // Fallback: create simple questions if parsing fails
+      parsedQuestions = [
+        `Tell me about your experience with ${role}`,
+        `What are your strengths in this role?`,
+        `How do you handle challenges in your work?`,
+        `What interests you about this position?`,
+        `Where do you see yourself in 5 years?`
+      ];
+    }
+
     const interview = {
       role: role,
       type: type,
       level: level,
-      techstack: techstack.split(","),
-      questions: JSON.parse(questions),
+      techstack: typeof techstack === 'string' ? techstack.split(",").map(t => t.trim()) : techstack,
+      questions: parsedQuestions,
       userId: userid,
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date().toISOString(),
     };
 
-    await db.collection("interviews").add(interview);
+    console.log("Creating interview:", interview);
+    const docRef = await db.collection("interviews").add(interview);
+    console.log("Interview created with ID:", docRef.id);
 
-    return Response.json({ success: true }, { status: 200 });
+    return Response.json({ success: true, interviewId: docRef.id }, { status: 200 });
   } catch (error) {
-    console.error("Error:", error);
-    return Response.json({ success: false, error: error }, { status: 500 });
+    console.error("Error in generate route:", error);
+    return Response.json({ success: false, error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }
 

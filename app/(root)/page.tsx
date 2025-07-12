@@ -10,8 +10,14 @@ import {
   getLatestInterviews,
 } from "@/lib/actions/general.action";
 
-async function Home() {
+async function Home({ searchParams }: { searchParams: Promise<{ refresh?: string }> }) {
   const user = await getCurrentUser();
+  const params = await searchParams;
+
+  // If refresh parameter is present, add a small delay to ensure data is updated
+  if (params.refresh === "true") {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 
   const [userInterviews, allInterview] = await Promise.all([
     getInterviewsByUserId(user?.id!),

@@ -5,8 +5,8 @@ const Page = async () => {
   const user = await getCurrentUser();
 
   return (
-    <>
-      <h3>Interview generation</h3>
+    <div className="flex flex-col gap-8">
+      <h3 className="text-center">Interview generation</h3>
 
       <Agent
         userName={user?.name!}
@@ -14,7 +14,7 @@ const Page = async () => {
         profileImage={user?.profileURL}
         type="generate"
       />
-    </>
+    </div>
   );
 };
 

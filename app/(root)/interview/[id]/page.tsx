@@ -25,26 +25,30 @@ const InterviewDetails = async ({ params }: RouteParams) => {
   });
 
   return (
-    <>
-      <div className="flex flex-row gap-4 justify-between">
-        <div className="flex flex-row gap-4 items-center max-sm:flex-col">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-row gap-4 justify-between items-center max-sm:flex-col max-sm:items-start">
           <div className="flex flex-row gap-4 items-center">
             <Image
               src={getRandomInterviewCover()}
               alt="cover-image"
-              width={40}
-              height={40}
-              className="rounded-full object-cover size-[40px]"
+              width={50}
+              height={50}
+              className="rounded-full object-cover size-[50px]"
             />
-            <h3 className="capitalize">{interview.role} Interview</h3>
+            <h3 className="text-2xl font-semibold capitalize text-primary-100">
+              {interview.role} Interview
+            </h3>
           </div>
 
-          <DisplayTechIcons techStack={interview.techstack} />
-        </div>
+          <div className="flex flex-row gap-4 items-center">
+            <DisplayTechIcons techStack={interview.techstack} />
 
-        <p className="bg-dark-200 px-4 py-2 rounded-lg h-fit">
-          {interview.type}
-        </p>
+            <span className="bg-dark-200 px-4 py-2 rounded-lg text-sm font-medium text-primary-200">
+              {interview.type}
+            </span>
+          </div>
+        </div>
       </div>
 
       <Agent
@@ -55,7 +59,7 @@ const InterviewDetails = async ({ params }: RouteParams) => {
         questions={interview.questions}
         feedbackId={feedback?.id}
       />
-    </>
+    </div>
   );
 };
 
