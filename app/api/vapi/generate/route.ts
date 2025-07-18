@@ -6,13 +6,14 @@ import { getRandomInterviewCover } from "@/lib/utils";
 
 export async function POST(request: Request) {
   try {
-    const { type, role, level, techstack, amount, userid } = await request.json();
-    
-    console.log("Received interview data:", { type, role, level, techstack, amount, userid });
+    const { type, role, level, techstack, amount, userid } =
+      await request.json();
 
     if (!type || !role || !level || !techstack || !amount || !userid) {
-      console.error("Missing required fields:", { type, role, level, techstack, amount, userid });
-      return Response.json({ success: false, error: "Missing required fields" }, { status: 400 });
+      return Response.json(
+        { success: false, error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     const { text: questions } = await generateText({
@@ -32,20 +33,17 @@ export async function POST(request: Request) {
     `,
     });
 
-    console.log("Generated questions:", questions);
-
     let parsedQuestions;
     try {
       parsedQuestions = JSON.parse(questions);
     } catch (parseError) {
-      console.error("Error parsing questions:", parseError);
       // Fallback: create simple questions if parsing fails
       parsedQuestions = [
         `Tell me about your experience with ${role}`,
         `What are your strengths in this role?`,
         `How do you handle challenges in your work?`,
         `What interests you about this position?`,
-        `Where do you see yourself in 5 years?`
+        `Where do you see yourself in 5 years?`,
       ];
     }
 
@@ -53,7 +51,10 @@ export async function POST(request: Request) {
       role: role,
       type: type,
       level: level,
-      techstack: typeof techstack === 'string' ? techstack.split(",").map(t => t.trim()) : techstack,
+      techstack:
+        typeof techstack === "string"
+          ? techstack.split(",").map((t) => t.trim())
+          : techstack,
       questions: parsedQuestions,
       userId: userid,
       finalized: true,
@@ -61,14 +62,20 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("Creating interview:", interview);
     const docRef = await db.collection("interviews").add(interview);
-    console.log("Interview created with ID:", docRef.id);
 
-    return Response.json({ success: true, interviewId: docRef.id }, { status: 200 });
+    return Response.json(
+      { success: true, interviewId: docRef.id },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("Error in generate route:", error);
-    return Response.json({ success: false, error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
+    return Response.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }
 

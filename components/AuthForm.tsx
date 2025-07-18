@@ -89,9 +89,43 @@ const AuthForm = ({ type }: { type: FormType }) => {
         toast.success("Signed in successfully.");
         router.push("/");
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(`There was an error: ${error}`);
+    } catch (error: unknown) {
+      const errorCode = (error as any)?.code || (error as any)?.message || "";
+      let message = "An unexpected error occurred. Please try again later.";
+
+      if (isSignIn) {
+        switch (errorCode) {
+          case "auth/user-not-found":
+            message =
+              "No account found with this email. Please check your email or sign up first.";
+            break;
+          case "auth/wrong-password":
+            message =
+              "Incorrect password. Please try again or reset your password.";
+            break;
+          case "auth/invalid-email":
+            message =
+              "The email address is not valid. Please check and try again.";
+            break;
+          case "auth/invalid-credential":
+            message =
+              "Invalid credentials. Please check your email and password.";
+            break;
+          case "auth/too-many-requests":
+            message =
+              "Too many failed attempts. Please wait a moment and try again.";
+            break;
+          case "auth/user-disabled":
+            message =
+              "This account has been disabled. Please contact support for help.";
+            break;
+          default:
+            // Optionally, log the error code for debugging
+            break;
+        }
+      }
+
+      toast.error(message);
     }
   };
 

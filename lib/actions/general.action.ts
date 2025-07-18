@@ -60,8 +60,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
     await feedbackRef.set(feedback);
 
     return { success: true, feedbackId: feedbackRef.id };
-  } catch (error) {
-    console.error("Error saving feedback:", error);
+  } catch {
     return { success: false };
   }
 }
@@ -112,20 +111,16 @@ export async function getLatestInterviews(
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
-  console.log("Fetching interviews for userId:", userId);
-  
   const interviews = await db
     .collection("interviews")
     .where("userId", "==", userId)
     .orderBy("createdAt", "desc")
     .get();
 
-  console.log("Found interviews:", interviews.docs.length);
   const result = interviews.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) as Interview[];
-  
-  console.log("Interview data:", result);
+
   return result;
 }

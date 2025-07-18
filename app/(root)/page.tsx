@@ -10,7 +10,11 @@ import {
   getLatestInterviews,
 } from "@/lib/actions/general.action";
 
-async function Home({ searchParams }: { searchParams: Promise<{ refresh?: string }> }) {
+async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ refresh?: string }>;
+}) {
   const user = await getCurrentUser();
   const params = await searchParams;
 
@@ -28,7 +32,7 @@ async function Home({ searchParams }: { searchParams: Promise<{ refresh?: string
   const hasUpcomingInterviews = allInterview?.length! > 0;
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col overflow-y-auto">
       <section className="card-cta">
         <div className="flex flex-col gap-6 max-w-lg">
           <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
@@ -72,12 +76,12 @@ async function Home({ searchParams }: { searchParams: Promise<{ refresh?: string
         </div>
       </section>
 
+      {/* Third Section: Take Interviews */}
       <section className="flex flex-col gap-6 mt-8">
         <h2>Take Interviews</h2>
-
         <div className="interviews-section">
-          {hasUpcomingInterviews ? (
-            allInterview?.map((interview) => (
+          {allInterview && allInterview.length > 0 ? (
+            allInterview.map((interview) => (
               <InterviewCard
                 key={interview.id}
                 userId={user?.id}
@@ -89,11 +93,11 @@ async function Home({ searchParams }: { searchParams: Promise<{ refresh?: string
               />
             ))
           ) : (
-            <p>There are no interviews available</p>
+            <p>No new interviews available. Try generating one!</p>
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

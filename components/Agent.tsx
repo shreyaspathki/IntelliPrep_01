@@ -54,39 +54,40 @@ const Agent = ({
     };
 
     const onSpeechStart = () => {
-      console.log("speech start");
       setIsSpeaking(true);
     };
 
     const onSpeechEnd = () => {
-      console.log("speech end");
       setIsSpeaking(false);
     };
 
-    const onError = (error: any) => {
-      console.log("Error:", error);
+    const onError = (error: unknown) => {
       setCallStatus(CallStatus.INACTIVE);
 
       // Handle specific VAPI errors
-      if (error?.error?.type === "no-room") {
-        console.log("VAPI room was deleted or ended");
+      if (
+        typeof error === "object" &&
+        error &&
+        "error" in error &&
+        (error as any).error?.type === "no-room"
+      ) {
       }
     };
 
-    vapi.on("call-start", onCallStart);
-    vapi.on("call-end", onCallEnd);
-    vapi.on("message", onMessage);
-    vapi.on("speech-start", onSpeechStart);
-    vapi.on("speech-end", onSpeechEnd);
-    vapi.on("error", onError);
+    vapi!.on("call-start", onCallStart);
+    vapi!.on("call-end", onCallEnd);
+    vapi!.on("message", onMessage);
+    vapi!.on("speech-start", onSpeechStart);
+    vapi!.on("speech-end", onSpeechEnd);
+    vapi!.on("error", onError);
 
     return () => {
-      vapi.off("call-start", onCallStart);
-      vapi.off("call-end", onCallEnd);
-      vapi.off("message", onMessage);
-      vapi.off("speech-start", onSpeechStart);
-      vapi.off("speech-end", onSpeechEnd);
-      vapi.off("error", onError);
+      vapi!.off("call-start", onCallStart);
+      vapi!.off("call-end", onCallEnd);
+      vapi!.off("message", onMessage);
+      vapi!.off("speech-start", onSpeechStart);
+      vapi!.off("speech-end", onSpeechEnd);
+      vapi!.off("error", onError);
     };
   }, []);
 
@@ -163,17 +164,11 @@ const Agent = ({
   // }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
 
   useEffect(() => {
-    console.log("[Debug] CallStatus:", callStatus, "Type:", type);
-
     if (messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       setLastMessage(lastMsg.content);
 
-      console.log("[Debug] Last Message Content:", lastMsg.content);
-
       const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-        console.log("handleGenerateFeedback");
-
         const { success, feedbackId: id } = await createFeedback({
           interviewId: interviewId!,
           userId: userId!,
@@ -184,32 +179,26 @@ const Agent = ({
         if (success && id) {
           router.push(`/interview/${interviewId}/feedback`);
         } else {
-          console.log("Error saving feedback");
           router.push("/");
         }
       };
 
       const handleGenerateInterview = async () => {
         const lastMessage = messages[messages.length - 1];
-        console.log("[Debug] RAW Last Message:", lastMessage.content);
 
         const relevantMessages = messages
           .slice(-6)
           .map((m) => m.content)
           .join(" ");
-        console.log("[Debug] Combined Final:", relevantMessages);
 
         // Try to find INTERVIEW_DATA in the last message
         if (lastMessage && lastMessage.content.includes("INTERVIEW_DATA:")) {
-          console.log("[Debug] Found INTERVIEW_DATA in message");
           try {
             const dataMatch = lastMessage.content.match(
               /INTERVIEW_DATA:\s*(\{[\s\S]*\})/
             );
             if (dataMatch) {
-              console.log("[Debug] Regex match found:", dataMatch[1]);
               const interviewData = JSON.parse(dataMatch[1]);
-              console.log("[Debug] Parsed interview data:", interviewData);
 
               // Make API call to create interview
               const response = await fetch("/api/vapi/generate", {
@@ -224,13 +213,11 @@ const Agent = ({
               });
 
               if (response.ok) {
-                const result = await response.json();
-                console.log("Interview created successfully:", result);
+                await response.json();
                 router.push("/?refresh=true");
                 return;
               } else {
-                const errorData = await response.json();
-                console.error("Failed to create interview:", errorData);
+                await response.json();
               }
             }
           } catch (error) {
@@ -239,17 +226,11 @@ const Agent = ({
         }
 
         // If we couldn't parse the data, try to extract from the conversation
-        console.log("[Debug] Trying to extract data from conversation...");
         const conversation = messages.map((m) => m.content).join(" ");
-        console.log("[Debug] Full conversation:", conversation);
 
         // Look for patterns in the conversation to extract interview data
         // Based on the debug output, the bot is saying: "Interview data, type, mixed, role, front end developer, level, junior, tech stack, JavaScript, amount, 5."
         // Let's create a simple pattern to extract this
-        console.log(
-          "[Debug] Trying to match pattern in last message:",
-          lastMessage.content
-        );
 
         // Try to match in the last message first
         let simplePattern = lastMessage.content.match(
@@ -258,15 +239,10 @@ const Agent = ({
 
         // If not found in last message, try the full conversation
         if (!simplePattern) {
-          console.log(
-            "[Debug] Not found in last message, trying full conversation"
-          );
           simplePattern = conversation.match(
             /interview data.*?type.*?(\w+).*?role.*?([^,]+).*?level.*?(\w+).*?tech stack.*?([^,]+).*?amount.*?(\d+)/i
           );
         }
-
-        console.log("[Debug] Simple pattern match result:", simplePattern);
 
         if (simplePattern) {
           const interviewData = {
@@ -276,11 +252,6 @@ const Agent = ({
             techstack: simplePattern[4].trim(),
             amount: parseInt(simplePattern[5]),
           };
-
-          console.log(
-            "[Debug] Extracted interview data from bot format:",
-            interviewData
-          );
 
           try {
             const response = await fetch("/api/vapi/generate", {
@@ -295,19 +266,11 @@ const Agent = ({
             });
 
             if (response.ok) {
-              const result = await response.json();
-              console.log(
-                "Interview created successfully from bot format:",
-                result
-              );
+              await response.json();
               router.push("/?refresh=true");
               return;
             } else {
-              const errorData = await response.json();
-              console.error(
-                "Failed to create interview from bot format:",
-                errorData
-              );
+              await response.json();
             }
           } catch (error) {
             console.error("Error creating interview from bot format:", error);
@@ -340,8 +303,6 @@ const Agent = ({
             amount: parseInt(amountMatch[1]),
           };
 
-          console.log("[Debug] Extracted interview data:", interviewData);
-
           try {
             const response = await fetch("/api/vapi/generate", {
               method: "POST",
@@ -355,19 +316,11 @@ const Agent = ({
             });
 
             if (response.ok) {
-              const result = await response.json();
-              console.log(
-                "Interview created successfully from extracted data:",
-                result
-              );
+              await response.json();
               router.push("/?refresh=true");
               return;
             } else {
-              const errorData = await response.json();
-              console.error(
-                "Failed to create interview from extracted data:",
-                errorData
-              );
+              await response.json();
             }
           } catch (error) {
             console.error(
@@ -378,9 +331,6 @@ const Agent = ({
         }
 
         // If all else fails, redirect anyway
-        console.log(
-          "[Debug] Could not extract interview data, redirecting anyway"
-        );
         router.push("/?refresh=true");
       };
 
@@ -405,11 +355,6 @@ const Agent = ({
 
         if (!hasInterviewData && callDuration > 300000) {
           // 5 minutes timeout
-          console.log(
-            "[Debug] Timeout reached, forcing interview creation with default data"
-          );
-
-          // Use setTimeout to handle async operation
           setTimeout(async () => {
             try {
               const response = await fetch("/api/vapi/generate", {
@@ -428,9 +373,7 @@ const Agent = ({
               });
 
               if (response.ok) {
-                console.log("Default interview created successfully");
               } else {
-                console.error("Failed to create default interview");
               }
             } catch (error) {
               console.error("Error creating default interview:", error);
@@ -484,7 +427,7 @@ const Agent = ({
     try {
       if (type === "generate") {
         // For generate type, use a modified interviewer that collects interview details first
-        await vapi.start(
+        await vapi!.start(
           {
             ...interviewer,
             firstMessage: `Hello ${userName}! I'm here to help you create a personalized interview. Let me ask you a few questions to generate the perfect interview for you.
@@ -566,7 +509,7 @@ DO NOT add any other text, explanations, or thank you messages. ONLY output the 
             .join("\n");
         }
 
-        await vapi.start(interviewer, {
+        await vapi!.start(interviewer, {
           variableValues: {
             username: userName,
             userid: userId,
@@ -580,13 +523,22 @@ DO NOT add any other text, explanations, or thank you messages. ONLY output the 
     }
   };
 
-  const handleDisconnect = () => {
-    setCallStatus(CallStatus.FINISHED);
-    vapi.stop();
+  const handleDisconnect = async () => {
+    try {
+      setCallStatus(CallStatus.FINISHED);
+
+      if (vapi) {
+        await vapi.stop();
+      } else {
+      }
+    } catch (error) {
+      console.error("❌ Error stopping call:", error);
+      // Still set status to finished even if stop fails
+      setCallStatus(CallStatus.FINISHED);
+    }
   };
 
   const handleManualGenerate = async () => {
-    console.log("[Debug] Manual generate triggered");
     try {
       const response = await fetch("/api/vapi/generate", {
         method: "POST",
@@ -604,12 +556,10 @@ DO NOT add any other text, explanations, or thank you messages. ONLY output the 
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Manual interview created successfully:", result);
+        await response.json();
         router.push("/?refresh=true");
       } else {
-        const errorData = await response.json();
-        console.error("Failed to create manual interview:", errorData);
+        await response.json();
       }
     } catch (error) {
       console.error("Error creating manual interview:", error);

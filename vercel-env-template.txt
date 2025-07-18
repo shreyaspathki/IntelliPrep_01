@@ -1,0 +1,46 @@
+# Vercel Environment Variables Template
+# Copy these to your Vercel project settings
+
+# Primary VAPI Account
+NEXT_PUBLIC_VAPI_WEB_TOKEN=your_primary_web_token_here
+NEXT_PUBLIC_VAPI_WORKFLOW_ID=your_primary_workflow_id_here
+NEXT_PUBLIC_VAPI_ASSISTANT_ID=your_primary_assistant_id_here
+
+# VAPI Account 1
+NEXT_PUBLIC_VAPI_WEB_TOKEN_1=your_web_token_1_here
+NEXT_PUBLIC_VAPI_WORKFLOW_ID_1=your_workflow_id_1_here
+NEXT_PUBLIC_VAPI_ASSISTANT_ID_1=your_assistant_id_1_here
+
+# VAPI Account 2
+NEXT_PUBLIC_VAPI_WEB_TOKEN_2=your_web_token_2_here
+NEXT_PUBLIC_VAPI_WORKFLOW_ID_2=your_workflow_id_2_here
+NEXT_PUBLIC_VAPI_ASSISTANT_ID_2=your_assistant_id_2_here
+
+# VAPI Account 3
+NEXT_PUBLIC_VAPI_WEB_TOKEN_3=your_web_token_3_here
+NEXT_PUBLIC_VAPI_WORKFLOW_ID_3=your_workflow_id_3_here
+NEXT_PUBLIC_VAPI_ASSISTANT_ID_3=your_assistant_id_3_here
+
+# VAPI Account 4
+NEXT_PUBLIC_VAPI_WEB_TOKEN_4=your_web_token_4_here
+NEXT_PUBLIC_VAPI_WORKFLOW_ID_4=your_workflow_id_4_here
+NEXT_PUBLIC_VAPI_ASSISTANT_ID_4=your_assistant_id_4_here
+
+# Google AI
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
+
+# Base URL (Update this to your Vercel domain)
+NEXT_PUBLIC_BASE_URL=https://your-vercel-domain.vercel.app
+
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain_here
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id_here
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket_here
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id_here
+NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id_here
+
+# Firebase Admin
+FIREBASE_PROJECT_ID=your_firebase_project_id_here
+FIREBASE_CLIENT_EMAIL=your_firebase_client_email_here
+FIREBASE_PRIVATE_KEY=your_firebase_private_key_here
