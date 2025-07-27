@@ -1,5 +1,5 @@
-#!/usr/bin/env node
-
+/*
+// test-vapi-setup.js content commented out for safe removal
 // Test script to verify multi-account VAPI setup
 const fs = require("fs");
 const path = require("path");
@@ -134,3 +134,4 @@ if (validAccounts > 0) {
 }
 
 console.log("\n🚀 Ready to test the application!");
+*/

@@ -1,3 +1,5 @@
+/*
+// setup-env.js content commented out for safe removal
 #!/usr/bin/env node
 
 const fs = require("fs");
@@ -181,3 +183,4 @@ if (require.main === module) {
 }
 
 module.exports = { createEnvFile, createVercelTemplate };
+*/
